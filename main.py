@@ -21,16 +21,35 @@ play_button = TextButton(
     screen,
     collide_button_sound
 )
+exit_button = TextButton(
+    "exit",
+    (WIDTH // 2, HEIGHT // 2),
+    screen,
+    collide_button_sound
+)
 
 
 def game():
     running = True
     while running:
         screen.fill((40, 40, 100))
+        mx, my = pygame.mouse.get_pos()
+
+        clicked = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    clicked = True
+
+        if exit_button.collided(mx, my):
+            if clicked:
+                return
+
+        exit_button.update()
 
         pygame.display.update()
         clock.tick(FPS)
