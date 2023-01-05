@@ -113,8 +113,8 @@ class Button(pygame.sprite.Sprite):
 class TextButton(Button):
     def __init__(self, text, coords, display, sound, font_size=5):
         self.font5 = Font("data/font/letters.png", font_size)
-        image = self.font5.render(text, (220, 220, 220))
-        pressed_image = self.font5.render(text, (240, 240, 0))
+        image = self.font5.render(text, (200, 200, 200))
+        pressed_image = self.font5.render(text, (220, 220, 30))
 
         super().__init__(image, pressed_image, coords, display, sound)
 
