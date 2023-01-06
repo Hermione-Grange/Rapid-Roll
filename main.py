@@ -7,7 +7,7 @@ clock = pygame.time.Clock()
 pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 pygame.display.set_caption("Rapid Roll")
-WINDOW_SIZE = (600, 800)
+WINDOW_SIZE = WIDTH, HEIGHT = (600, 800)
 screen = pygame.display.set_mode(WINDOW_SIZE)
 display = pygame.Surface(WINDOW_SIZE)
 FPS = 100
@@ -215,9 +215,9 @@ def generate_tiles(tiles_for_ball, thorn_tiles_for_ball, life_hearts):
 
     if generate_or_no:
         if randint(0, 5) == 0:
-            thorn_tiles_for_ball.append(Tile((randint(0, 454), 900), thorn_tile_image))
+            thorn_tiles_for_ball.append(Tile((randint(0, WIDTH - thorn_tile_image.get_width()), 900), thorn_tile_image))
         else:
-            coord_y = randint(0, 454)
+            coord_y = randint(0, WIDTH - tile_image.get_width())
             tiles_for_ball.append(Tile((coord_y, 900)))
             if randint(0, 8) == 0:
                 life_hearts.append(Life_heart((coord_y + 60, 875)))
