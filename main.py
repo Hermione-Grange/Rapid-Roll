@@ -357,12 +357,14 @@ def load_records():
         data = file.read().strip().split("\n")
     if data == [""]:
         return []
-    game_records = {}
-    for i in range(len(data)):
-        List = data[i].split(":")
-        game_records[int(List[0])] = List[1]
-    sorted_keys = sorted(game_records, reverse=True)
-    return (sorted_keys, game_records)
+    
+    result = list()
+    for line in data:
+        line = line.split(":")
+        line[0] = int(line[0])
+        result.append(line)
+    
+    return result
 
 
 def save_level(level):
@@ -476,10 +478,11 @@ def registration_menu():
 
     base_font = pygame.font.Font(None, 40)
 
-    # set left, top, width, height in
-    # Pygame.Rect()
-    input_rect = pygame.Rect(200, 200, 100,50)
-    color_active = pygame.Color("red")
+    user_text = ''
+    back_space_pressed = False
+    back_space_counter = 0
+    back_space_delay = 5
+    back_space_auto = 30
 
     while running:
         mx, my = pygame.mouse.get_pos()
@@ -533,6 +536,7 @@ def registration_menu():
         screen.blit(display, (0, 0))
         pygame.display.update()
         clock.tick(FPS)
+
     return user_text
 
 
