@@ -61,6 +61,7 @@ life_bar = load_image("sprites/life_bar")
 
 cursor_img = load_image("sprites/orange_cursor")
 
+your_name_label = load_image("labels/your_name_label", scale=(2, 2))
 your_score_label = load_image("labels/your_score_label", scale=(5, 5))
 save_label = load_image("labels/save_label", scale=(5, 5))
 
@@ -323,18 +324,23 @@ def load_game():
     else:
         life_hearts = list(map(lambda x: list(map(int, x.split())), life_hearts.split("\n")))
     ball_coords_and_health = list(map(int, data.pop(0).split("\n")))
-    return score, tiles_for_ball, thorn_tiles_for_ball, life_hearts, (
-    ball_coords_and_health[:2], ball_coords_and_health[2])
+    return (
+        score,
+        tiles_for_ball,
+        thorn_tiles_for_ball,
+        life_hearts,
+        (ball_coords_and_health[:2], ball_coords_and_health[2]),
+    )
 
-
-def save_record(result):
+def save_record(name, result):
     with open("SAV/records.txt", "a", encoding="utf-8") as file:
-        file.write(f"\n{result}")
-    records = load_records()
-    if len(records) > 15:
-        records = records[:15]
+        file.write(f"\n{result}:{name}")
+    sorted_keys, data = load_records()
+    if len(sorted_keys) > 15:
+        sorted_keys = sorted_keys[:15]
         with open("SAV/records.txt", "w", encoding="utf-8") as file:
-            file.write("\n".join(map(str, records)))
+            for i in range(len(sorted_keys)):
+                file.write("\n".join(sorted_keys[i] + ":" + data[sorted_keys[i]]))
 
 
 def load_records():
@@ -342,8 +348,12 @@ def load_records():
         data = file.read().strip().split("\n")
     if data == [""]:
         return []
-    data = sorted(map(int, data), reverse=True)
-    return data
+    slovar = {}
+    for i in range(len(data)):
+        spisok = data[i].split(":")
+        slovar[int(spisok[0])] = spisok[1]
+    sorted_keys = sorted(slovar, reverse=True)
+    return (sorted_keys, slovar)
 
 
 def save_level(level):
@@ -386,8 +396,9 @@ def records_menu():
                 if event.button == 1:
                     click = True
 
-        for ind, num in enumerate(load_records()):
-            text = font.render(f"{ind + 1}) {num}", 1, (0, 162, 232))
+        sorted_keys, data = load_records()
+        for ind in range(len(sorted_keys)):
+            text = font.render(f"{ind + 1}) {sorted_keys[ind]}: {data[sorted_keys[ind]]}", 1, (0, 162, 232))
             display.blit(text, (100, ind * 50 + 30))
 
         back_1_button.update()
@@ -413,7 +424,8 @@ def death_menu(score):
         if yes_button.collided(mx, my):
             if click:
                 sleep(0.1)
-                save_record(score)
+                name_of_player = registration_menu()
+                save_record(name_of_player, score)
                 running = False
 
         click = False
@@ -438,6 +450,61 @@ def death_menu(score):
         draw_cursor(mx, my)
 
         screen.blit(display, (0, 0))
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+def registration_menu():
+    click = False
+    running = True
+    user_text = ''
+    base_font = pygame.font.Font(None, 40)
+
+    # set left, top, width, height in
+    # Pygame.Rect()
+    input_rect = pygame.Rect(500, 300, 100, 100)
+    color_active = pygame.Color("red")
+
+    while running:
+        mx, my = pygame.mouse.get_pos()
+        display.fill((40, 40, 40))
+
+        if yes_button.collided(mx, my):
+            if click:
+                sleep(0.1)
+                running = False
+
+        click = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                print(user_text)
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                if event.key == pygame.K_BACKSPACE:
+
+                    # stores text except last letter
+                    user_text = user_text[0:-1]
+                else:
+                    user_text += event.unicode
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        pygame.draw.rect(screen, color_active, input_rect)
+        display.blit(your_name_label, (WINDOW_SIZE[0] // 2 - your_name_label.get_width() // 2, 100))
+
+        # TODO: to draw ok_button image
+        yes_button.update()
+        draw_cursor(mx, my)
+
+        screen.blit(display, (0, 0))
+        text_surface = base_font.render(user_text, True, (255, 255, 255))
+        screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
         pygame.display.update()
         clock.tick(FPS)
 
