@@ -505,7 +505,6 @@ def registration_menu():
         screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
         pygame.display.update()
         clock.tick(FPS)
-    print(user_text)
     return user_text
 
 
