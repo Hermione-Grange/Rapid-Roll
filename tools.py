@@ -98,3 +98,9 @@ class Button(pygame.sprite.Sprite):
         if (not previous_mouse) and self.mouse_on:
             self.sound.play()
         return self.mouse_on
+    
+    def set_coords(self, coords):
+        self.rect.topleft = coords
+    
+    def copy(self):
+        return Button(self.image.copy(), self.pressed.copy(), self.rect.topleft, self.display, self.sound)
