@@ -348,12 +348,12 @@ def load_records():
         data = file.read().strip().split("\n")
     if data == [""]:
         return []
-    slovar = {}
+    game_records = {}
     for i in range(len(data)):
-        spisok = data[i].split(":")
-        slovar[int(spisok[0])] = spisok[1]
-    sorted_keys = sorted(slovar, reverse=True)
-    return (sorted_keys, slovar)
+        List = data[i].split(":")
+        game_records[int(List[0])] = List[1]
+    sorted_keys = sorted(game_records, reverse=True)
+    return (sorted_keys, game_records)
 
 
 def save_level(level):
@@ -462,7 +462,7 @@ def registration_menu():
 
     # set left, top, width, height in
     # Pygame.Rect()
-    input_rect = pygame.Rect(200, 200, 100, 100)
+    input_rect = pygame.Rect(200, 200, 100,50)
     color_active = pygame.Color("red")
 
     while running:
