@@ -61,7 +61,7 @@ life_bar = load_image("sprites/life_bar")
 
 cursor_img = load_image("sprites/orange_cursor")
 
-your_name_label = load_image("labels/your_name_label", scale=(2, 2))
+your_name_label = load_image("labels/your_name_label", scale=(1, 1))
 your_score_label = load_image("labels/your_score_label", scale=(5, 5))
 save_label = load_image("labels/save_label", scale=(5, 5))
 
@@ -462,7 +462,7 @@ def registration_menu():
 
     # set left, top, width, height in
     # Pygame.Rect()
-    input_rect = pygame.Rect(500, 300, 100, 100)
+    input_rect = pygame.Rect(200, 200, 100, 100)
     color_active = pygame.Color("red")
 
     while running:
@@ -473,13 +473,11 @@ def registration_menu():
             if click:
                 sleep(0.1)
                 running = False
-
         click = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                print(user_text)
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -507,6 +505,8 @@ def registration_menu():
         screen.blit(text_surface, (input_rect.x + 5, input_rect.y + 5))
         pygame.display.update()
         clock.tick(FPS)
+    print(user_text)
+    return user_text
 
 
 def choose_level_menu():
