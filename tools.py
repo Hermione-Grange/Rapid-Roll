@@ -124,14 +124,14 @@ class Slider(pygame.sprite.Sprite):
         self.size = size
 
         self.image = pygame.Surface(size)
-        pygame.draw.rect(self.image, (230, 230, 230), (self.offset, self.offset, size[0] - self.offset * 2, size[1] - self.offset * 2), 2, self.radius)
+        pygame.draw.rect(self.image, (70, 106, 155), (self.offset, self.offset, size[0] - self.offset * 2, size[1] - self.offset * 2), 2, self.radius)
         self.image.set_colorkey((0, 0, 0))
 
         self.rect = self.image.get_rect(center=coords)
 
         self.point_image = pygame.Surface((size[1], size[1] * 1.5))
-        pygame.draw.rect(self.point_image, (230, 230, 230), (0, 0, *self.point_image.get_size()), 0, self.radius)
-        pygame.draw.rect(self.point_image, (200, 200, 200), (0, 0, *self.point_image.get_size()), 2, self.radius)
+        pygame.draw.rect(self.point_image, (112, 146, 190), (0, 0, *self.point_image.get_size()), 0, self.radius)
+        pygame.draw.rect(self.point_image, (70, 106, 155), (0, 0, *self.point_image.get_size()), 2, self.radius)
         self.point_image.set_colorkey((0, 0, 0))
 
         self.point_rect = self.point_image.get_rect(center=(coords[0] - size[0] // 2 + self.offset * 2, coords[1]))
@@ -163,7 +163,7 @@ class Slider(pygame.sprite.Sprite):
         image = self.image.copy()
         pygame.draw.rect(
             image,
-            (230, 230, 230),
+            (112, 146, 190),
             (
                 self.offset, self.offset, self.point_rect.centerx - self.start, self.size[1] - self.offset * 2
             ),
