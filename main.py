@@ -2,10 +2,7 @@ import sys
 from random import randint
 from tools import *
 from time import sleep
-import pygame
-import pygame_widgets
-from pygame_widgets.slider import Slider
-from pygame_widgets.textbox import TextBox
+
 
 clock = pygame.time.Clock()
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -14,7 +11,9 @@ pygame.display.set_caption("Rapid Roll")
 WINDOW_SIZE = WIDTH, HEIGHT = (600, 800)
 screen = pygame.display.set_mode(WINDOW_SIZE)
 display = pygame.Surface(WINDOW_SIZE)
+
 pygame.mixer.music.load("844.mp3")
+pygame.mixer.music.set_volume(0.5)
 
 FPS = 100
 pygame.mouse.set_visible(False)
@@ -718,10 +717,8 @@ def settings_menu():
     click = False
     running = True
 
-    slider = Slider(display, 20, 100, 550, 10, min=0, max=99, step=1)
-    output = TextBox(display, 283, 120, 30, 30, fontSize=20)
-
-    output.disable()  # Act as label instead of textbox
+    slider = Slider(display, (WIDTH // 2, 200), (400, 16))
+    slider.set_value(0.5)
 
     while running:
         mx, my = pygame.mouse.get_pos()
@@ -742,14 +739,20 @@ def settings_menu():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
+            
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+            
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    slider.release()
 
-        output.setText(slider.getValue())
-        pygame_widgets.update(events)
 
         back_1_button.update()
+        slider.update(click, (mx, my))
+
+        pygame.mixer.music.set_volume(slider.get_value())
 
         draw_cursor(mx, my)
 

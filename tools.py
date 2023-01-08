@@ -114,3 +114,62 @@ class Button(pygame.sprite.Sprite):
             self.display,
             self.sound,
         )
+
+
+class Slider(pygame.sprite.Sprite):
+    def __init__(self, display, coords, size=(200, 20)):
+        self.offset = size[1] // 8
+        self.radius = size[1] // 2
+        self.display = display
+        self.size = size
+
+        self.image = pygame.Surface(size)
+        pygame.draw.rect(self.image, (230, 230, 230), (self.offset, self.offset, size[0] - self.offset * 2, size[1] - self.offset * 2), 2, self.radius)
+        self.image.set_colorkey((0, 0, 0))
+
+        self.rect = self.image.get_rect(center=coords)
+
+        self.point_image = pygame.Surface((size[1], size[1] * 1.5))
+        pygame.draw.rect(self.point_image, (230, 230, 230), (0, 0, *self.point_image.get_size()), 0, self.radius)
+        pygame.draw.rect(self.point_image, (200, 200, 200), (0, 0, *self.point_image.get_size()), 2, self.radius)
+        self.point_image.set_colorkey((0, 0, 0))
+
+        self.point_rect = self.point_image.get_rect(center=(coords[0] - size[0] // 2 + self.offset * 2, coords[1]))
+
+        self.start, self.end = self.point_rect.centerx, self.point_rect.centerx + size[0] - size[1] // 2
+        self.length = self.end - self.start
+        self.dragged = False
+    
+    def release(self):
+        self.dragged = False
+    
+    def set_value(self, num):
+        self.point_rect.x = self.start + self.length * (num)
+
+    def get_value(self) -> int:
+        return round((self.point_rect.centerx - self.start) / self.length * 100) / 100
+    
+    def update(self, clicked, mouse_pos):
+        if clicked and self.rect.collidepoint(mouse_pos):
+            self.dragged = True
+        if self.dragged:
+            if mouse_pos[0] <= self.start:
+                self.point_rect.centerx = self.start
+            elif mouse_pos[0] >= self.end:
+                self.point_rect.centerx = self.end
+            else:
+                self.point_rect.centerx = mouse_pos[0]
+        
+        image = self.image.copy()
+        pygame.draw.rect(
+            image,
+            (230, 230, 230),
+            (
+                self.offset, self.offset, self.point_rect.centerx - self.start, self.size[1] - self.offset * 2
+            ),
+            0,
+            self.radius
+        )
+
+        self.display.blit(image, self.rect)
+        self.display.blit(self.point_image, self.point_rect)
