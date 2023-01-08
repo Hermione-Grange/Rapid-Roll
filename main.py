@@ -10,12 +10,18 @@ pygame.display.set_caption("Rapid Roll")
 WINDOW_SIZE = WIDTH, HEIGHT = (600, 800)
 screen = pygame.display.set_mode(WINDOW_SIZE)
 display = pygame.Surface(WINDOW_SIZE)
+pygame.mixer.music.load("844.mp3")
+
 FPS = 100
 pygame.mouse.set_visible(False)
 
 # load sound and music
 collide_button_sound = pygame.mixer.Sound("sounds/button.mp3")
 collide_button_sound.set_volume(0.3)
+
+background_music = pygame.mixer.Sound("sounds/button.mp3")
+background_music.set_volume(0.3)
+
 
 # load_images_start_________________________________________________________#
 ball_image = load_image("sprites/red_ball")
@@ -46,11 +52,15 @@ no_pressed_image = load_image("buttons/no_pressed_image")
 records_image = load_image("buttons/records_image")
 records_presed_image = load_image("buttons/records_pressed_image")
 
+settings_image = load_image("buttons/settings_image")
+settings_pressed_image = load_image("buttons/settings_pressed_image")
+
 one_image = load_image("buttons/one_image")
 one_pressed_image = load_image("buttons/one_pressed_image")
 two_image = load_image("buttons/two_image")
 two_pressed_image = load_image("buttons/two_pressed_image")
-three_image = load_image("buttons/three_image")
+three_image = load_image("buttons/three_image"
+                         "")
 three_pressed_image = load_image("buttons/three_pressed_image")
 
 # background_image = load_image("background_image", scale=(20, 20))
@@ -312,6 +322,22 @@ records_button = Button(
     records_image,
     records_presed_image,
     (WIDTH // 2 - records_image.get_width() // 2, 390),
+    display,
+    collide_button_sound,
+)
+
+settings_button = Button(
+    settings_image,
+    settings_pressed_image,
+    (WIDTH // 2 - settings_image.get_width() // 2, 470),
+    display,
+    collide_button_sound,
+)
+
+help_button = Button(
+    level_image,
+    level_pressed_image,
+    (WIDTH // 2 - level_image.get_width() // 2, 550),
     display,
     collide_button_sound,
 )
@@ -684,6 +710,14 @@ def choose_level_menu():
         clock.tick(FPS)
 
 
+def settings_menu():
+    pass
+
+
+def info_menu():
+    pass
+
+
 def game(
     score=0,
     tiles_for_ball_from_file=None,
@@ -876,6 +910,16 @@ def main_menu():
                 sleep(0.1)
                 records_menu()
 
+        if settings_button.collided(mx, my):
+            if click:
+                sleep(0.1)
+                settings_menu()
+
+        if help_button.collided(mx, my):
+            if click:
+                sleep(0.1)
+                info_menu()
+
         click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -893,6 +937,8 @@ def main_menu():
         new_game_button.update()
         level_button.update()
         records_button.update()
+        settings_button.update()
+        help_button.update()
         draw_cursor(mx, my)
         screen.blit(display, (0, 0))
         pygame.display.update()
@@ -900,4 +946,5 @@ def main_menu():
 
 
 if __name__ == "__main__":
+    pygame.mixer.music.play(-1)
     main_menu()
