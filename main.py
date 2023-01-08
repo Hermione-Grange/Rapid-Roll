@@ -61,6 +61,7 @@ life_bar = load_image("sprites/life_bar")
 
 cursor_img = load_image("sprites/orange_cursor")
 
+your_name_label = load_image("labels/your_name_label", scale=(4, 4))
 your_score_label = load_image("labels/your_score_label", scale=(5, 5))
 save_label = load_image("labels/save_label", scale=(5, 5))
 
@@ -73,9 +74,12 @@ three_level_label = load_image("labels/three_level_label", scale=(2, 2))
 font = pygame.font.SysFont("consolas", 35)
 font1 = pygame.font.SysFont("consolas", 70)
 
+letters = "abcdefghijklmnopqrstuvwxyz"
+letters += letters.upper() + " 123456789"
+
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, coords=(WINDOW_SIZE[0] // 2, 100), health=3):
+    def __init__(self, coords=(WIDTH // 2, 100), health=3):
         pygame.sprite.Sprite.__init__(self)
         self.image = ball_image
         self.rect = self.image.get_rect(topleft=coords)
@@ -238,29 +242,32 @@ def draw_cursor(mx, my):
     display.blit(cursor_img, (mx - 1, my - 1))
 
 
-continue_button = Button(continue_image, continue_pressed_image, (WINDOW_SIZE[0] // 2 - continue_image.get_width() // 2,
+continue_button = Button(continue_image, continue_pressed_image, (WIDTH // 2 - continue_image.get_width() // 2,
                                                                   150), display, collide_button_sound)
 
-new_game_button = Button(new_game_image, new_game_pressed_image, (WINDOW_SIZE[0] // 2 - new_game_image.get_width() // 2,
+new_game_button = Button(new_game_image, new_game_pressed_image, (WIDTH // 2 - new_game_image.get_width() // 2,
                                                                   230), display, collide_button_sound)
 
-level_button = Button(level_image, level_pressed_image, (WINDOW_SIZE[0] // 2 - level_image.get_width() // 2, 310),
+level_button = Button(level_image, level_pressed_image, (WIDTH // 2 - level_image.get_width() // 2, 310),
                       display, collide_button_sound)
 
 back_button = Button(back_image, back_pressed_image, (10, 10), display, collide_button_sound)
 
 back_1_button = Button(back_1_image, back_1_pressed_image, (10, 10), display, collide_button_sound)
 
-no_button = Button(no_image, no_pressed_image, (WINDOW_SIZE[0] // 2 - no_image.get_width() // 2 + 70, 500), display, collide_button_sound)
+no_button = Button(no_image, no_pressed_image, (WIDTH // 2 - no_image.get_width() // 2 + 70, 500), display, collide_button_sound)
 
-yes_button = Button(yes_image, yes_pressed_image, (WINDOW_SIZE[0] // 2 - yes_image.get_width() // 2 - 70, 500), display, collide_button_sound)
+yes_button = Button(yes_image, yes_pressed_image, (WIDTH // 2 - yes_image.get_width() // 2 - 70, 500), display, collide_button_sound)
+
+yes_button_1 = yes_button.copy()
+yes_button_1.set_coords((WIDTH // 2 - yes_image.get_width() // 2, 500))
 
 records_button = Button(records_image, records_presed_image,
-                        (WINDOW_SIZE[0] // 2 - records_image.get_width() // 2, 390), display, collide_button_sound)
+                        (WIDTH // 2 - records_image.get_width() // 2, 390), display, collide_button_sound)
 
-one_button = Button(one_image, one_pressed_image, (WINDOW_SIZE[0] // 2 - one_image.get_width() // 2 - 100, 390), display, collide_button_sound)
-two_button = Button(two_image, two_pressed_image, (WINDOW_SIZE[0] // 2 - two_image.get_width() // 2, 390), display, collide_button_sound)
-three_button = Button(three_image, three_pressed_image, (WINDOW_SIZE[0] // 2 - three_image.get_width() // 2 + 100, 390), display, collide_button_sound)
+one_button = Button(one_image, one_pressed_image, (WIDTH // 2 - one_image.get_width() // 2 - 100, 390), display, collide_button_sound)
+two_button = Button(two_image, two_pressed_image, (WIDTH // 2 - two_image.get_width() // 2, 390), display, collide_button_sound)
+three_button = Button(three_image, three_pressed_image, (WIDTH // 2 - three_image.get_width() // 2 + 100, 390), display, collide_button_sound)
 
 
 def save_game(score, tiles_for_ball, thorn_tiles_for_ball, life_hearts, ball):
@@ -323,18 +330,26 @@ def load_game():
     else:
         life_hearts = list(map(lambda x: list(map(int, x.split())), life_hearts.split("\n")))
     ball_coords_and_health = list(map(int, data.pop(0).split("\n")))
-    return score, tiles_for_ball, thorn_tiles_for_ball, life_hearts, (
-    ball_coords_and_health[:2], ball_coords_and_health[2])
+    return (
+        score,
+        tiles_for_ball,
+        thorn_tiles_for_ball,
+        life_hearts,
+        (ball_coords_and_health[:2], ball_coords_and_health[2]),
+    )
 
-
-def save_record(result):
+def save_record(name, result):
     with open("SAV/records.txt", "a", encoding="utf-8") as file:
-        file.write(f"\n{result}")
-    records = load_records()
-    if len(records) > 15:
-        records = records[:15]
-        with open("SAV/records.txt", "w", encoding="utf-8") as file:
-            file.write("\n".join(map(str, records)))
+        file.write(f"{result}:{name}")
+    
+    data = load_records()
+    data.sort(key=lambda line: line[0], reverse=True)
+
+    if len(data) > 15:
+        data = data[:15]
+    with open("SAV/records.txt", "w", encoding="utf-8") as file:
+        for score, name in data:
+            file.write(f"{score}:{name}\n")
 
 
 def load_records():
@@ -342,8 +357,14 @@ def load_records():
         data = file.read().strip().split("\n")
     if data == [""]:
         return []
-    data = sorted(map(int, data), reverse=True)
-    return data
+    
+    result = list()
+    for line in data:
+        line = line.split(":")
+        line[0] = int(line[0])
+        result.append(line)
+    
+    return result
 
 
 def save_level(level):
@@ -365,6 +386,14 @@ def load_level():
 def records_menu():
     click = False
     running = True
+
+    records = load_records()
+    if records:
+        max_length = max(records, key=lambda line: line[0])
+        max_length = len(str(max_length[0]))
+    else:
+        max_length = 0
+
     while running:
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
@@ -386,9 +415,9 @@ def records_menu():
                 if event.button == 1:
                     click = True
 
-        for ind, num in enumerate(load_records()):
-            text = font.render(f"{ind + 1}) {num}", 1, (0, 162, 232))
-            display.blit(text, (100, ind * 50 + 30))
+        for i, line in enumerate(records):
+            text = font.render(f"{str(line[0]).ljust(max_length, ' ')} - {line[1]}", 1, (0, 162, 232))
+            display.blit(text, (100, i * 50 + 30))
 
         back_1_button.update()
         draw_cursor(mx, my)
@@ -413,7 +442,8 @@ def death_menu(score):
         if yes_button.collided(mx, my):
             if click:
                 sleep(0.1)
-                save_record(score)
+                name_of_player = registration_menu()
+                save_record(name_of_player, score)
                 running = False
 
         click = False
@@ -428,10 +458,10 @@ def death_menu(score):
                 if event.button == 1:
                     click = True
 
-        display.blit(your_score_label, (WINDOW_SIZE[0] // 2 - your_score_label.get_width() // 2, 100))
+        display.blit(your_score_label, (WIDTH // 2 - your_score_label.get_width() // 2, 100))
         text = font1.render(str(score), 1, (0, 162, 232))
-        display.blit(text, (WINDOW_SIZE[0] // 2 - text.get_width() // 2, 200))
-        display.blit(save_label, (WINDOW_SIZE[0] // 2 - save_label.get_width() // 2, 400))
+        display.blit(text, (WIDTH // 2 - text.get_width() // 2, 200))
+        display.blit(save_label, (WIDTH // 2 - save_label.get_width() // 2, 400))
 
         no_button.update()
         yes_button.update()
@@ -440,6 +470,74 @@ def death_menu(score):
         screen.blit(display, (0, 0))
         pygame.display.update()
         clock.tick(FPS)
+
+
+def registration_menu():
+    click = False
+    running = True
+
+    base_font = pygame.font.Font(None, 40)
+
+    user_text = ''
+    back_space_pressed = False
+    back_space_counter = 0
+    back_space_delay = 5
+    back_space_auto = 30
+
+    while running:
+        mx, my = pygame.mouse.get_pos()
+        display.fill((40, 40, 40))
+
+        if yes_button_1.collided(mx, my):
+            if click:
+                sleep(0.1)
+                running = False
+        click = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                if event.key == pygame.K_BACKSPACE:
+                    back_space_pressed = True
+                    back_space_counter = 0
+                    # stores text except last letter
+                    user_text = user_text[0:-1]
+                else:
+                    letter = event.unicode
+                    if letter in letters:
+                        user_text += event.unicode
+            
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_BACKSPACE:
+                    back_space_pressed = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+        
+        if back_space_pressed:
+            back_space_counter += 1
+            if back_space_counter >= back_space_auto:
+                back_space_counter -= back_space_delay
+                user_text = user_text[0:-1]
+        
+        text_surface = base_font.render(user_text, True, (210, 210, 210))
+        display.blit(text_surface, (WIDTH // 2 - text_surface.get_width() // 2, 230))
+
+        display.blit(your_name_label, (WIDTH // 2 - your_name_label.get_width() // 2, 100))
+
+        yes_button_1.update()
+        draw_cursor(mx, my)
+
+        screen.blit(display, (0, 0))
+        pygame.display.update()
+        clock.tick(FPS)
+
+    return user_text
 
 
 def choose_level_menu():
