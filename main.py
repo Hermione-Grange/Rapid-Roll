@@ -728,14 +728,21 @@ def settings_menu():
         display.fill((40, 40, 40))
         events = pygame.event.get()
 
+        if back_1_button.collided(mx, my):
+            if click:
+                sleep(0.1)
+                break
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
+        draw_cursor(mx, my)
         screen.blit(display, (0, 0))
         output.setText(slider.getValue())
         pygame_widgets.update(events)
+        back_1_button.update()
         pygame.display.update()
         clock.tick(FPS)
 
