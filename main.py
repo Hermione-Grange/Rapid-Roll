@@ -2,6 +2,10 @@ import sys
 from random import randint
 from tools import *
 from time import sleep
+import pygame
+import pygame_widgets
+from pygame_widgets.slider import Slider
+from pygame_widgets.textbox import TextBox
 
 clock = pygame.time.Clock()
 pygame.mixer.pre_init(44100, -16, 2, 512)
@@ -711,7 +715,29 @@ def choose_level_menu():
 
 
 def settings_menu():
-    pass
+    click = False
+    running = True
+
+    slider = Slider(screen, 20, 100, 550, 10, min=0, max=99, step=1)
+    output = TextBox(screen, 283, 120, 30, 30, fontSize=20)
+
+    output.disable()  # Act as label instead of textbox
+
+    while running:
+        mx, my = pygame.mouse.get_pos()
+        display.fill((40, 40, 40))
+        events = pygame.event.get()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        screen.blit(display, (0, 0))
+        output.setText(slider.getValue())
+        pygame_widgets.update(events)
+        pygame.display.update()
+        clock.tick(FPS)
 
 
 def info_menu():
