@@ -733,6 +733,7 @@ def settings_menu():
                 sleep(0.1)
                 break
 
+        click = False
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
