@@ -2,8 +2,6 @@ import sys
 from random import randint
 from tools import *
 from time import sleep
-import pygame_widgets
-from pygame_widgets.textbox import TextBox
 
 
 clock = pygame.time.Clock()
@@ -720,7 +718,6 @@ def settings_menu():
     running = True
 
     slider = Slider(display, (WIDTH // 2, 200), (400, 16))
-    output = TextBox(display, 285, 135, 40, 30, fontSize=23)
     slider.set_value(0.5)
 
     while running:
@@ -754,11 +751,6 @@ def settings_menu():
 
         back_1_button.update()
         slider.update(click, (mx, my))
-        output.updateCursor()
-        value = slider.get_value()
-        output.setText(value)
-        pygame_widgets.update(events)
-
 
         pygame.mixer.music.set_volume(slider.get_value())
 
