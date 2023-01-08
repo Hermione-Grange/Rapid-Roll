@@ -737,12 +737,19 @@ def settings_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
 
         draw_cursor(mx, my)
         screen.blit(display, (0, 0))
         output.setText(slider.getValue())
         pygame_widgets.update(events)
         back_1_button.update()
+        screen.blit(display, (0, 0))
         pygame.display.update()
         clock.tick(FPS)
 
