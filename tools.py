@@ -1,26 +1,29 @@
 import pygame
 
 
-def load_image(file_name, *, ext='png', color_key=True, scale=()):
-    image = pygame.image.load(f'{file_name}.{ext}').convert()
+def load_image(file_name, *, ext="png", color_key=True, scale=()):
+    image = pygame.image.load(f"{file_name}.{ext}").convert()
     if color_key:
         image.set_colorkey((255, 255, 255))
     if scale:
-        image = pygame.transform.scale(image, (image.get_width() * scale[0], image.get_height() * scale[1]))
+        image = pygame.transform.scale(
+            image, (image.get_width() * scale[0], image.get_height() * scale[1])
+        )
     return image
 
 
 # animation_functions_start_________________________________________________#
 def load_animation(path, frame_durations, animation_frames) -> list:
-    animation_name = path.split('/')[-1]
+    animation_name = path.split("/")[-1]
     animation_frame_data = []
     n = 0
     for frame in frame_durations:
-        animation_frame_id = animation_name + '_' + str(n)
-        img_loc = path + '/' + animation_frame_id + '.png'
+        animation_frame_id = animation_name + "_" + str(n)
+        img_loc = path + "/" + animation_frame_id + ".png"
         animation_image = pygame.image.load(img_loc).convert()
-        animation_image = pygame.transform.scale(animation_image,
-                                                 (animation_image.get_width(), animation_image.get_height()))
+        animation_image = pygame.transform.scale(
+            animation_image, (animation_image.get_width(), animation_image.get_height())
+        )
         animation_image.set_colorkey((255, 255, 255))
         animation_frames[animation_frame_id] = animation_image.copy()
         for i in range(frame):
@@ -49,26 +52,27 @@ def collision_test(rect, tiles) -> list:
 
 
 def move(rect, movement, tiles) -> tuple:
-    collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
+    collision_types = {"top": False, "bottom": False, "right": False, "left": False}
     rect.y += movement[1]
     hit_list = collision_test(rect, tiles)
     for tile in hit_list:
         if movement[1] > 0:
             rect.bottom = tile.top
-            collision_types['bottom'] = True
+            collision_types["bottom"] = True
         elif movement[1] < 0:
             rect.top = tile.bottom
-            collision_types['top'] = True
+            collision_types["top"] = True
     rect.x += movement[0]
     hit_list = collision_test(rect, tiles)
     for tile in hit_list:
         if movement[0] > 0:
             rect.right = tile.left
-            collision_types['right'] = True
+            collision_types["right"] = True
         elif movement[0] < 0:
             rect.left = tile.right
-            collision_types['left'] = True
+            collision_types["left"] = True
     return rect, collision_types
+
 
 # collide_functions_end_____________________________________________________#
 
@@ -98,9 +102,15 @@ class Button(pygame.sprite.Sprite):
         if (not previous_mouse) and self.mouse_on:
             self.sound.play()
         return self.mouse_on
-    
+
     def set_coords(self, coords):
         self.rect.topleft = coords
-    
+
     def copy(self):
-        return Button(self.image.copy(), self.pressed.copy(), self.rect.topleft, self.display, self.sound)
+        return Button(
+            self.image.copy(),
+            self.pressed.copy(),
+            self.rect.topleft,
+            self.display,
+            self.sound,
+        )
