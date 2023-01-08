@@ -718,8 +718,8 @@ def settings_menu():
     click = False
     running = True
 
-    slider = Slider(screen, 20, 100, 550, 10, min=0, max=99, step=1)
-    output = TextBox(screen, 283, 120, 30, 30, fontSize=20)
+    slider = Slider(display, 20, 100, 550, 10, min=0, max=99, step=1)
+    output = TextBox(display, 283, 120, 30, 30, fontSize=20)
 
     output.disable()  # Act as label instead of textbox
 
@@ -733,10 +733,11 @@ def settings_menu():
                 sleep(0.1)
                 break
 
-        for event in pygame.event.get():
+        for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
@@ -744,11 +745,13 @@ def settings_menu():
                 if event.button == 1:
                     click = True
 
-        draw_cursor(mx, my)
-        screen.blit(display, (0, 0))
         output.setText(slider.getValue())
         pygame_widgets.update(events)
+
         back_1_button.update()
+
+        draw_cursor(mx, my)
+
         screen.blit(display, (0, 0))
         pygame.display.update()
         clock.tick(FPS)
