@@ -342,6 +342,14 @@ sound_button = Button(
     collide_button_sound,
 )
 
+theme_button = Button(
+    level_image,
+    level_pressed_image,
+    (WIDTH // 2 - sound_image.get_width() // 2, 400),
+    display,
+    collide_button_sound,
+)
+
 settings_button = Button(
     settings_image,
     settings_pressed_image,
@@ -516,10 +524,6 @@ def records_menu():
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
 
-        if back_1_button.collided(mx, my):
-            if click:
-                return
-
         click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -531,6 +535,10 @@ def records_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+        
+        if back_1_button.collided(mx, my):
+            if click:
+                return
         
         cubes.update()
 
@@ -555,17 +563,6 @@ def death_menu(score):
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
 
-        if no_button.collided(mx, my):
-            if click:
-                running = False
-                return
-
-        if yes_button.collided(mx, my):
-            if click:
-                name_of_player = registration_menu()
-                save_record(name_of_player, score)
-                running = False
-
         click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -577,6 +574,17 @@ def death_menu(score):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+        
+        if no_button.collided(mx, my):
+            if click:
+                running = False
+                return
+
+        if yes_button.collided(mx, my):
+            if click:
+                name_of_player = registration_menu()
+                save_record(name_of_player, score)
+                running = False
         
         cubes.update()
 
@@ -611,11 +619,6 @@ def registration_menu():
     while running:
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
-
-        if yes_button_1.collided(mx, my):
-            if click:
-                running = False
-                return
         
         click = False
 
@@ -644,6 +647,11 @@ def registration_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+
+        if yes_button_1.collided(mx, my):
+            if click:
+                running = False
+                return
 
         if back_space_pressed:
             back_space_counter += 1
@@ -678,6 +686,18 @@ def choose_level_menu():
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
 
+        click = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
         if back_1_button.collided(mx, my):
             if click:
                 return
@@ -696,18 +716,6 @@ def choose_level_menu():
             if click:
                 save_level(3)
                 current_level_label = 3
-
-        click = False
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    click = True
 
         cubes.update()
 
@@ -739,10 +747,6 @@ def sound_menu():
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
 
-        if back_1_button.collided(mx, my):
-            if click:
-                return
-
         click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -760,6 +764,10 @@ def sound_menu():
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     slider.release()
+
+        if back_1_button.collided(mx, my):
+            if click:
+                return
 
         cubes.update()
 
@@ -783,10 +791,6 @@ def theme_menu():
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
 
-        if back_1_button.collided(mx, my):
-            if click:
-                return
-
         click = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -800,6 +804,10 @@ def theme_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+        
+        if back_1_button.collided(mx, my):
+            if click:
+                return
         
         back_1_button.update()
 
@@ -817,19 +825,9 @@ def settings_menu():
     while running:
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
-        events = pygame.event.get()
-
-        if back_1_button.collided(mx, my):
-            if click:
-                return
-        
-        if sound_button.collided(mx, my):
-            if click:
-                sound_menu()
-                continue
 
         click = False
-        for event in events:
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -842,10 +840,25 @@ def settings_menu():
                 if event.button == 1:
                     click = True
         
+        if back_1_button.collided(mx, my):
+            if click:
+                return
+        
+        if sound_button.collided(mx, my):
+            if click:
+                sound_menu()
+                continue
+
+        if theme_button.collided(mx, my):
+            if click:
+                theme_menu()
+                continue
+        
         cubes.update()
 
         back_1_button.update()
         sound_button.update()
+        theme_button.update()
 
         draw_cursor(mx, my)
 
@@ -1029,6 +1042,20 @@ def main_menu():
 
         # checking button presses
         mx, my = pygame.mouse.get_pos()
+
+        click = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+        
         if new_game_button.collided(mx, my):
             if click:
                 game()
@@ -1054,23 +1081,10 @@ def main_menu():
                 settings_menu()
                 continue
 
-        if help_button.collided(mx, my):
-            if click:
-                info_menu()
-                continue
-
-        click = False
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    click = True
+        # if help_button.collided(mx, my):
+        #     if click:
+        #         info_menu()
+        #         continue
         
         cubes.update()
 
@@ -1079,7 +1093,7 @@ def main_menu():
         level_button.update()
         records_button.update()
         settings_button.update()
-        help_button.update()
+        # help_button.update()
         
 
         draw_cursor(mx, my)
