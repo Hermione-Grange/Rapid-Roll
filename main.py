@@ -1,7 +1,5 @@
-import sys
-from random import randint
 from tools import *
-from time import sleep
+from decorations import Cubes
 
 
 clock = pygame.time.Clock()
@@ -25,6 +23,8 @@ collide_button_sound.set_volume(0.3)
 background_music = pygame.mixer.Sound("sounds/button.mp3")
 background_music.set_volume(0.3)
 
+slider = Slider(display, (WIDTH // 2, 200), (400, 16))
+slider.set_value(0.5)
 
 # load_images_start_________________________________________________________#
 ball_image = load_image("sprites/red_ball")
@@ -55,6 +55,9 @@ no_pressed_image = load_image("buttons/no_pressed_image")
 records_image = load_image("buttons/records_image")
 records_presed_image = load_image("buttons/records_pressed_image")
 
+sound_image = load_image("buttons/sound_image")
+sound_pressed_image = load_image("buttons/sound_pressed_image")
+
 settings_image = load_image("buttons/settings_image")
 settings_pressed_image = load_image("buttons/settings_pressed_image")
 
@@ -83,12 +86,14 @@ two_level_label = load_image("labels/two_level_label", scale=(2, 2))
 three_level_label = load_image("labels/three_level_label", scale=(2, 2))
 # load_images_end___________________________________________________________#
 
-
 font = pygame.font.SysFont("consolas", 35)
 font1 = pygame.font.SysFont("consolas", 70)
 
 letters = "abcdefghijklmnopqrstuvwxyz"
 letters += letters.upper() + " 123456789"
+
+
+cubes = Cubes(display, WINDOW_SIZE)
 
 
 class Ball(pygame.sprite.Sprite):
@@ -329,6 +334,14 @@ records_button = Button(
     collide_button_sound,
 )
 
+sound_button = Button(
+    sound_image,
+    sound_pressed_image,
+    (WIDTH // 2 - sound_image.get_width() // 2, 300),
+    display,
+    collide_button_sound,
+)
+
 settings_button = Button(
     settings_image,
     settings_pressed_image,
@@ -505,7 +518,6 @@ def records_menu():
 
         if back_1_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 break
 
         click = False
@@ -519,6 +531,8 @@ def records_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+        
+        cubes.update()
 
         for i, line in enumerate(records):
             text = font.render(
@@ -543,12 +557,10 @@ def death_menu(score):
 
         if no_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 running = False
 
         if yes_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 name_of_player = registration_menu()
                 save_record(name_of_player, score)
                 running = False
@@ -564,6 +576,8 @@ def death_menu(score):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+        
+        cubes.update()
 
         display.blit(
             your_score_label, (WIDTH // 2 - your_score_label.get_width() // 2, 100)
@@ -599,7 +613,6 @@ def registration_menu():
 
         if yes_button_1.collided(mx, my):
             if click:
-                sleep(0.1)
                 running = False
         click = False
 
@@ -608,8 +621,9 @@ def registration_menu():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE or event.key == pygame.K_RETURN:
                     running = False
+                
                 if event.key == pygame.K_BACKSPACE:
                     back_space_pressed = True
                     back_space_counter = 0
@@ -633,6 +647,8 @@ def registration_menu():
             if back_space_counter >= back_space_auto:
                 back_space_counter -= back_space_delay
                 user_text = user_text[0:-1]
+        
+        cubes.update()
 
         text_surface = base_font.render(user_text, True, (210, 210, 210))
         display.blit(text_surface, (WIDTH // 2 - text_surface.get_width() // 2, 230))
@@ -661,24 +677,20 @@ def choose_level_menu():
 
         if back_1_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 break
 
         if one_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 save_level(1)
                 current_level_label = 1
 
         if two_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 save_level(2)
                 current_level_label = 2
 
         if three_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 save_level(3)
                 current_level_label = 3
 
@@ -694,6 +706,8 @@ def choose_level_menu():
                 if event.button == 1:
                     click = True
 
+        cubes.update()
+
         if current_level_label == 1:
             display.blit(one_level_label, (300 - one_level_label.get_width() // 2, 170))
         elif current_level_label == 2:
@@ -702,6 +716,7 @@ def choose_level_menu():
             display.blit(
                 three_level_label, (300 - three_level_label.get_width() // 2, 170)
             )
+
         back_1_button.update()
         one_button.update()
         two_button.update()
@@ -713,12 +728,9 @@ def choose_level_menu():
         clock.tick(FPS)
 
 
-def settings_menu():
+def sound_menu():
     click = False
     running = True
-
-    slider = Slider(display, (WIDTH // 2, 200), (400, 16))
-    slider.set_value(0.5)
 
     while running:
         mx, my = pygame.mouse.get_pos()
@@ -727,7 +739,6 @@ def settings_menu():
 
         if back_1_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 break
 
         click = False
@@ -748,11 +759,55 @@ def settings_menu():
                 if event.button == 1:
                     slider.release()
 
+        cubes.update()
 
         back_1_button.update()
         slider.update(click, (mx, my))
 
         pygame.mixer.music.set_volume(slider.get_value())
+
+        draw_cursor(mx, my)
+
+        screen.blit(display, (0, 0))
+        pygame.display.update()
+        clock.tick(FPS)
+
+
+def settings_menu():
+    click = False
+    running = True
+
+    while running:
+        mx, my = pygame.mouse.get_pos()
+        display.fill((40, 40, 40))
+        events = pygame.event.get()
+
+        if back_1_button.collided(mx, my):
+            if click:
+                break
+        
+        if sound_button.collided(mx, my):
+            if click:
+                sound_menu()
+
+        click = False
+        for event in events:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+        
+        cubes.update()
+
+        back_1_button.update()
+        sound_button.update()
 
         draw_cursor(mx, my)
 
@@ -830,7 +885,6 @@ def game(
                     life_hearts,
                     ball.get_coords(),
                 )
-                sleep(0.1)
                 break
 
         display.fill((0, 132, 202))
@@ -939,32 +993,26 @@ def main_menu():
         mx, my = pygame.mouse.get_pos()
         if new_game_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 game()
 
         if continue_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 game(*load_game())
 
         if level_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 choose_level_menu()
 
         if records_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 records_menu()
 
         if settings_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 settings_menu()
 
         if help_button.collided(mx, my):
             if click:
-                sleep(0.1)
                 info_menu()
 
         click = False
@@ -979,6 +1027,8 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+        
+        cubes.update()
 
         continue_button.update()
         new_game_button.update()
@@ -986,7 +1036,10 @@ def main_menu():
         records_button.update()
         settings_button.update()
         help_button.update()
+        
+
         draw_cursor(mx, my)
+
         screen.blit(display, (0, 0))
         pygame.display.update()
         clock.tick(FPS)

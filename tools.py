@@ -1,5 +1,11 @@
 import pygame
 
+from random import randint
+import random
+import sys
+import math
+from time import sleep
+
 
 def load_image(file_name, *, ext="png", color_key=True, scale=()):
     image = pygame.image.load(f"{file_name}.{ext}").convert()
@@ -173,3 +179,7 @@ class Slider(pygame.sprite.Sprite):
 
         self.display.blit(image, self.rect)
         self.display.blit(self.point_image, self.point_rect)
+
+
+def chance(num: float = 1.00) -> int:
+    return random.randrange(0, 101) <= (round(num, 2) * 100)
