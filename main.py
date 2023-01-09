@@ -738,14 +738,13 @@ def sound_menu():
     while running:
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
-        events = pygame.event.get()
 
         if back_1_button.collided(mx, my):
             if click:
                 return
 
         click = False
-        for event in events:
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -776,6 +775,41 @@ def sound_menu():
         clock.tick(FPS)
 
 
+def theme_menu():
+    click = False
+    running = True
+
+    while running:
+        mx, my = pygame.mouse.get_pos()
+        display.fill((40, 40, 40))
+
+        if back_1_button.collided(mx, my):
+            if click:
+                return
+
+        click = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+        
+        back_1_button.update()
+
+        draw_cursor(mx, my)
+
+        screen.blit(display, (0, 0))
+        pygame.display.update()
+        clock.tick(FPS)
+
+
 def settings_menu():
     click = False
     running = True
@@ -792,6 +826,7 @@ def settings_menu():
         if sound_button.collided(mx, my):
             if click:
                 sound_menu()
+                continue
 
         click = False
         for event in events:
