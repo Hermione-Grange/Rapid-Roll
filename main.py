@@ -413,7 +413,7 @@ three_button = Button(
 theme_1_button = Button(
     theme_1_image,
     theme_1_pressed_image,
-    (100, 300),
+    (WIDTH // 2 - theme_1_image.get_width() // 2, 200),
     display,
     collide_button_sound,
 )
@@ -421,7 +421,7 @@ theme_1_button = Button(
 theme_2_button = Button(
     theme_2_image,
     theme_2_pressed_image,
-    (100, 400),
+    (WIDTH // 2 - theme_2_image.get_width() // 2, 310),
     display,
     collide_button_sound,
 )
@@ -823,6 +823,7 @@ def sound_menu():
 
 def theme_menu():
     global texture_index
+
     click = False
     running = True
 
@@ -855,6 +856,12 @@ def theme_menu():
         if theme_2_button.collided(mx, my):
             if click:
                 texture_index = 1
+        
+        if texture_index == 0:
+            theme_1_button.mouse_on = True
+        
+        elif texture_index == 1:
+            theme_2_button.mouse_on = True
 
         cubes.update()
 
