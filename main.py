@@ -518,7 +518,7 @@ def records_menu():
 
         if back_1_button.collided(mx, my):
             if click:
-                break
+                return
 
         click = False
         for event in pygame.event.get():
@@ -558,6 +558,7 @@ def death_menu(score):
         if no_button.collided(mx, my):
             if click:
                 running = False
+                return
 
         if yes_button.collided(mx, my):
             if click:
@@ -614,6 +615,8 @@ def registration_menu():
         if yes_button_1.collided(mx, my):
             if click:
                 running = False
+                return
+        
         click = False
 
         for event in pygame.event.get():
@@ -677,7 +680,7 @@ def choose_level_menu():
 
         if back_1_button.collided(mx, my):
             if click:
-                break
+                return
 
         if one_button.collided(mx, my):
             if click:
@@ -739,7 +742,7 @@ def sound_menu():
 
         if back_1_button.collided(mx, my):
             if click:
-                break
+                return
 
         click = False
         for event in events:
@@ -784,7 +787,7 @@ def settings_menu():
 
         if back_1_button.collided(mx, my):
             if click:
-                break
+                return
         
         if sound_button.collided(mx, my):
             if click:
@@ -994,26 +997,32 @@ def main_menu():
         if new_game_button.collided(mx, my):
             if click:
                 game()
+                continue
 
         if continue_button.collided(mx, my):
             if click:
                 game(*load_game())
+                continue
 
         if level_button.collided(mx, my):
             if click:
                 choose_level_menu()
+                continue
 
         if records_button.collided(mx, my):
             if click:
                 records_menu()
+                continue
 
         if settings_button.collided(mx, my):
             if click:
                 settings_menu()
+                continue
 
         if help_button.collided(mx, my):
             if click:
                 info_menu()
+                continue
 
         click = False
         for event in pygame.event.get():
