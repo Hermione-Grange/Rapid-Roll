@@ -11,7 +11,7 @@ screen = pygame.display.set_mode(WINDOW_SIZE)
 display = pygame.Surface(WINDOW_SIZE)
 
 pygame.mixer.music.load("844.mp3")
-pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.set_volume(0.0)
 
 FPS = 100
 pygame.mouse.set_visible(False)
@@ -20,16 +20,27 @@ pygame.mouse.set_visible(False)
 collide_button_sound = pygame.mixer.Sound("sounds/button.mp3")
 collide_button_sound.set_volume(0.3)
 
-background_music = pygame.mixer.Sound("sounds/button.mp3")
-background_music.set_volume(0.3)
-
 slider = Slider(display, (WIDTH // 2, 200), (400, 16))
-slider.set_value(0.5)
+slider.set_value(pygame.mixer.music.get_volume())
 
 # load_images_start_________________________________________________________#
-ball_image = load_image("sprites/red_ball")
-tile_image = load_image("sprites/tile_1")
-thorn_tile_image = load_image("sprites/thorn_tile")
+ball_image = load_image("sprites/textures_1/red_ball")
+tile_image = load_image("sprites/textures_1/tile_1")
+thorn_tile_image = load_image("sprites/textures_1/thorn_tile")
+
+textures = [
+    [
+        load_image("sprites/textures_1/red_ball"),
+        load_image("sprites/textures_1/tile_1"),
+        load_image("sprites/textures_1/thorn_tile"),
+    ],
+    [
+        load_image("sprites/textures_2/red_ball"),
+        load_image("sprites/textures_2/tile_1"),
+        load_image("sprites/textures_2/thorn_tile"),
+    ],
+]
+texture_index = 0
 
 new_game_image = load_image("buttons/new_game_image")
 new_game_pressed_image = load_image("buttons/new_game_pressed_image")
@@ -65,9 +76,20 @@ one_image = load_image("buttons/one_image")
 one_pressed_image = load_image("buttons/one_pressed_image")
 two_image = load_image("buttons/two_image")
 two_pressed_image = load_image("buttons/two_pressed_image")
-three_image = load_image("buttons/three_image"
-                         "")
+three_image = load_image("buttons/three_image")
 three_pressed_image = load_image("buttons/three_pressed_image")
+
+theme_1_image = load_image("sprites/theme_1")
+theme_1_pressed_image = theme_1_image.copy()
+pygame.draw.rect(
+    theme_1_pressed_image, (200, 200, 30), (0, 0, *theme_1_image.get_size()), 2, 5
+)
+
+theme_2_image = load_image("sprites/theme_2")
+theme_2_pressed_image = theme_2_image.copy()
+pygame.draw.rect(
+    theme_2_pressed_image, (200, 200, 30), (0, 0, *theme_2_image.get_size()), 2, 5
+)
 
 # background_image = load_image("background_image", scale=(20, 20))
 
@@ -99,7 +121,7 @@ cubes = Cubes(display, WINDOW_SIZE)
 class Ball(pygame.sprite.Sprite):
     def __init__(self, coords=(WIDTH // 2, 100), health=3):
         pygame.sprite.Sprite.__init__(self)
-        self.image = ball_image
+        self.image = textures[texture_index][0]
         self.rect = self.image.get_rect(topleft=coords)
 
         self.speed = 4
@@ -175,7 +197,7 @@ class Ball(pygame.sprite.Sprite):
 class Tile(pygame.sprite.Sprite):
     tile_speed = 1
 
-    def __init__(self, coords, image=tile_image):
+    def __init__(self, coords, image=textures[texture_index][1]):
         pygame.sprite.Sprite.__init__(self)
         self.image = image
         self.rect = self.image.get_rect(topleft=coords)
@@ -249,13 +271,13 @@ def generate_tiles(tiles_for_ball, thorn_tiles_for_ball, life_hearts):
         if randint(0, 5) == 0:
             thorn_tiles_for_ball.append(
                 Tile(
-                    (randint(0, WIDTH - thorn_tile_image.get_width()), 900),
-                    thorn_tile_image,
+                    (randint(0, WIDTH - textures[texture_index][2].get_width()), 900),
+                    textures[texture_index][2],
                 )
             )
         else:
-            coord_y = randint(0, WIDTH - tile_image.get_width())
-            tiles_for_ball.append(Tile((coord_y, 900)))
+            coord_y = randint(0, WIDTH - textures[texture_index][1].get_width())
+            tiles_for_ball.append(Tile((coord_y, 900), textures[texture_index][1]))
             if randint(0, 8) == 0:
                 life_hearts.append(Life_heart((coord_y + 60, 875)))
 
@@ -384,6 +406,22 @@ three_button = Button(
     three_image,
     three_pressed_image,
     (WIDTH // 2 - three_image.get_width() // 2 + 100, 390),
+    display,
+    collide_button_sound,
+)
+
+theme_1_button = Button(
+    theme_1_image,
+    theme_1_pressed_image,
+    (100, 300),
+    display,
+    collide_button_sound,
+)
+
+theme_2_button = Button(
+    theme_2_image,
+    theme_2_pressed_image,
+    (100, 400),
     display,
     collide_button_sound,
 )
@@ -535,11 +573,11 @@ def records_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
-        
+
         if back_1_button.collided(mx, my):
             if click:
                 return
-        
+
         cubes.update()
 
         for i, line in enumerate(records):
@@ -574,7 +612,7 @@ def death_menu(score):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
-        
+
         if no_button.collided(mx, my):
             if click:
                 running = False
@@ -585,7 +623,7 @@ def death_menu(score):
                 name_of_player = registration_menu()
                 save_record(name_of_player, score)
                 running = False
-        
+
         cubes.update()
 
         display.blit(
@@ -619,7 +657,7 @@ def registration_menu():
     while running:
         mx, my = pygame.mouse.get_pos()
         display.fill((40, 40, 40))
-        
+
         click = False
 
         for event in pygame.event.get():
@@ -629,7 +667,7 @@ def registration_menu():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE or event.key == pygame.K_RETURN:
                     running = False
-                
+
                 if event.key == pygame.K_BACKSPACE:
                     back_space_pressed = True
                     back_space_counter = 0
@@ -658,7 +696,7 @@ def registration_menu():
             if back_space_counter >= back_space_auto:
                 back_space_counter -= back_space_delay
                 user_text = user_text[0:-1]
-        
+
         cubes.update()
 
         text_surface = base_font.render(user_text, True, (210, 210, 210))
@@ -752,15 +790,15 @@ def sound_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-            
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
-            
+
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     slider.release()
@@ -784,6 +822,7 @@ def sound_menu():
 
 
 def theme_menu():
+    global texture_index
     click = False
     running = True
 
@@ -796,20 +835,32 @@ def theme_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-            
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
-        
+
         if back_1_button.collided(mx, my):
             if click:
                 return
-        
+
+        if theme_1_button.collided(mx, my):
+            if click:
+                texture_index = 0
+
+        if theme_2_button.collided(mx, my):
+            if click:
+                texture_index = 1
+
+        cubes.update()
+
         back_1_button.update()
+        theme_1_button.update()
+        theme_2_button.update()
 
         draw_cursor(mx, my)
 
@@ -831,19 +882,19 @@ def settings_menu():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-            
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
-        
+
         if back_1_button.collided(mx, my):
             if click:
                 return
-        
+
         if sound_button.collided(mx, my):
             if click:
                 sound_menu()
@@ -853,7 +904,7 @@ def settings_menu():
             if click:
                 theme_menu()
                 continue
-        
+
         cubes.update()
 
         back_1_button.update()
@@ -878,7 +929,10 @@ def game(
     life_hearts_from_file=None,
     ball_coords_and_health=None,
 ):
-    tiles_for_ball = [Tile((300, 500)), Tile((100, 800))]
+    tiles_for_ball = [
+        Tile((300, 500), textures[texture_index][1]),
+        Tile((100, 800), textures[texture_index][1]),
+    ]
     thorn_tiles_for_ball = []
     life_hearts = []
 
@@ -907,10 +961,10 @@ def game(
     if score != 0 and ball_coords_and_health[1] > 0:
         tiles_for_ball.clear()
         for tile in tiles_for_ball_from_file:
-            tiles_for_ball.append(Tile(tile))
+            tiles_for_ball.append(Tile(tile, textures[texture_index][2]))
 
         for tile in thorn_tiles_for_ball_from_file:
-            thorn_tiles_for_ball.append(Tile(tile, thorn_tile_image))
+            thorn_tiles_for_ball.append(Tile(tile, textures[texture_index][2]))
 
         for heart in life_hearts_from_file:
             life_hearts.append(Life_heart(heart))
@@ -1055,7 +1109,7 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
-        
+
         if new_game_button.collided(mx, my):
             if click:
                 game()
@@ -1085,7 +1139,7 @@ def main_menu():
         #     if click:
         #         info_menu()
         #         continue
-        
+
         cubes.update()
 
         continue_button.update()
@@ -1094,7 +1148,6 @@ def main_menu():
         records_button.update()
         settings_button.update()
         # help_button.update()
-        
 
         draw_cursor(mx, my)
 

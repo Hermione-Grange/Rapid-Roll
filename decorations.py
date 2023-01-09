@@ -7,12 +7,16 @@ class Cube(pygame.sprite.Sprite):
         self.image = pygame.Surface((size, size))
         self.coords = coords
         # pygame.draw.rect(self.image, (color,) * 3, (0, 0, size, size), width, round_value)
-        pygame.draw.polygon(self.image, (color,) * 3, (
-            (randint(0, size // 4), randint(0, size // 4)),
-            (randint(size // 1.5, size), randint(0, size // 4)),
-            (randint(size // 2, size), randint(size // 2, size)),
-            (randint(0, size // 4), randint(size // 2, size)),
-        ))
+        pygame.draw.polygon(
+            self.image,
+            (color,) * 3,
+            (
+                (randint(0, size // 4), randint(0, size // 4)),
+                (randint(size // 1.5, size), randint(0, size // 4)),
+                (randint(size // 2, size), randint(size // 2, size)),
+                (randint(0, size // 4), randint(size // 2, size)),
+            ),
+        )
         self.image.set_colorkey((0, 0, 0))
 
         self.origin_image = self.image.copy()
@@ -22,7 +26,7 @@ class Cube(pygame.sprite.Sprite):
 
         self.vx = random.randrange(-2, 3) / 10
         self.vy = speed
-    
+
     def update(self):
         self.coords[0] += self.vx
         self.coords[1] += self.vy
@@ -40,16 +44,26 @@ class Cubes:
 
         self.counter = 39
         self.counter_limit = 40
-    
+
     def update(self):
         self.counter += 1
         if self.counter > self.counter_limit:
             self.counter = 0
             num = randint(30, 90)
             speed = random.randrange(7, 20) / 10
-            color = (35 - speed * 8)
-            self.cubes_list.append(Cube(self.display, [randint(50, self.w_width - 50), -100], num, 0, num // 10, speed, color))
-        
+            color = 35 - speed * 8
+            self.cubes_list.append(
+                Cube(
+                    self.display,
+                    [randint(50, self.w_width - 50), -100],
+                    num,
+                    0,
+                    num // 10,
+                    speed,
+                    color,
+                )
+            )
+
         i = 0
         while i < len(self.cubes_list):
             self.cubes_list[i].update()

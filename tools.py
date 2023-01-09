@@ -130,31 +130,59 @@ class Slider(pygame.sprite.Sprite):
         self.size = size
 
         self.image = pygame.Surface(size)
-        pygame.draw.rect(self.image, (70, 106, 155), (self.offset, self.offset, size[0] - self.offset * 2, size[1] - self.offset * 2), 2, self.radius)
+        pygame.draw.rect(
+            self.image,
+            (70, 106, 155),
+            (
+                self.offset,
+                self.offset,
+                size[0] - self.offset * 2,
+                size[1] - self.offset * 2,
+            ),
+            2,
+            self.radius,
+        )
         self.image.set_colorkey((0, 0, 0))
 
         self.rect = self.image.get_rect(center=coords)
 
         self.point_image = pygame.Surface((size[1], size[1] * 1.5))
-        pygame.draw.rect(self.point_image, (112, 146, 190), (0, 0, *self.point_image.get_size()), 0, self.radius)
-        pygame.draw.rect(self.point_image, (70, 106, 155), (0, 0, *self.point_image.get_size()), 2, self.radius)
+        pygame.draw.rect(
+            self.point_image,
+            (112, 146, 190),
+            (0, 0, *self.point_image.get_size()),
+            0,
+            self.radius,
+        )
+        pygame.draw.rect(
+            self.point_image,
+            (70, 106, 155),
+            (0, 0, *self.point_image.get_size()),
+            2,
+            self.radius,
+        )
         self.point_image.set_colorkey((0, 0, 0))
 
-        self.point_rect = self.point_image.get_rect(center=(coords[0] - size[0] // 2 + self.offset * 2, coords[1]))
+        self.point_rect = self.point_image.get_rect(
+            center=(coords[0] - size[0] // 2 + self.offset * 2, coords[1])
+        )
 
-        self.start, self.end = self.point_rect.centerx, self.point_rect.centerx + size[0] - size[1] // 2
+        self.start, self.end = (
+            self.point_rect.centerx,
+            self.point_rect.centerx + size[0] - size[1] // 2,
+        )
         self.length = self.end - self.start
         self.dragged = False
-    
+
     def release(self):
         self.dragged = False
-    
+
     def set_value(self, num):
         self.point_rect.x = self.start + self.length * (num)
 
     def get_value(self) -> int:
         return round((self.point_rect.centerx - self.start) / self.length * 100) / 100
-    
+
     def update(self, clicked, mouse_pos):
         if clicked and self.rect.collidepoint(mouse_pos):
             self.dragged = True
@@ -165,16 +193,19 @@ class Slider(pygame.sprite.Sprite):
                 self.point_rect.centerx = self.end
             else:
                 self.point_rect.centerx = mouse_pos[0]
-        
+
         image = self.image.copy()
         pygame.draw.rect(
             image,
             (112, 146, 190),
             (
-                self.offset, self.offset, self.point_rect.centerx - self.start, self.size[1] - self.offset * 2
+                self.offset,
+                self.offset,
+                self.point_rect.centerx - self.start,
+                self.size[1] - self.offset * 2,
             ),
             0,
-            self.radius
+            self.radius,
         )
 
         self.display.blit(image, self.rect)
