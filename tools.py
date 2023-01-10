@@ -178,7 +178,7 @@ class Slider(pygame.sprite.Sprite):
         self.dragged = False
 
     def set_value(self, num):
-        self.point_rect.x = self.start + self.length * (num)
+        self.point_rect.centerx = self.start + self.length * (num)
 
     def get_value(self) -> int:
         return round((self.point_rect.centerx - self.start) / self.length * 100) / 100

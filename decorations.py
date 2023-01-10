@@ -7,16 +7,7 @@ class Cube(pygame.sprite.Sprite):
         self.image = pygame.Surface((size, size))
         self.coords = coords
         pygame.draw.rect(self.image, (color,) * 3, (0, 0, size, size), width, round_value)
-        # pygame.draw.polygon(
-        #     self.image,
-        #     (color,) * 3,
-        #     (
-        #         (randint(0, size // 4), randint(0, size // 4)),
-        #         (randint(size // 1.5, size), randint(0, size // 4)),
-        #         (randint(size // 2, size), randint(size // 2, size)),
-        #         (randint(0, size // 4), randint(size // 2, size)),
-        #     ),
-        # )
+
         self.image.set_colorkey((0, 0, 0))
 
         self.origin_image = self.image.copy()
