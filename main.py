@@ -10,18 +10,23 @@ WINDOW_SIZE = WIDTH, HEIGHT = (600, 800)
 screen = pygame.display.set_mode(WINDOW_SIZE)
 display = pygame.Surface(WINDOW_SIZE)
 
-pygame.mixer.music.load("844.mp3")
-pygame.mixer.music.set_volume(0.0)
-
 FPS = 100
 pygame.mouse.set_visible(False)
+
+pygame.mixer.music.load("844.mp3")
+pygame.mixer.music.set_volume(0.0)
 
 # load sound and music
 collide_button_sound = pygame.mixer.Sound("sounds/button.mp3")
 collide_button_sound.set_volume(0.3)
 
-slider = Slider(display, (WIDTH // 2, 200), (400, 16))
-slider.set_value(pygame.mixer.music.get_volume())
+music_slider = Slider(display, (WIDTH // 2, 200), (400, 16))
+music_slider.set_value(pygame.mixer.music.get_volume())
+
+effects_slider = Slider(display, (WIDTH // 2, 350), (400, 16))
+effects_slider.set_value(collide_button_sound.get_volume())
+
+effects_sounds = [collide_button_sound]
 
 # load_images_start_________________________________________________________#
 ball_image = load_image("sprites/textures_1/red_ball")
@@ -69,8 +74,14 @@ records_presed_image = load_image("buttons/records_pressed_image")
 sound_image = load_image("buttons/sound_image")
 sound_pressed_image = load_image("buttons/sound_pressed_image")
 
+theme_image = load_image("buttons/theme_image")
+theme_pressed_image = load_image("buttons/theme_pressed_image")
+
 settings_image = load_image("buttons/settings_image")
 settings_pressed_image = load_image("buttons/settings_pressed_image")
+
+info_image = load_image("buttons/info_image")
+info_pressed_image = load_image("buttons/info_pressed_image")
 
 one_image = load_image("buttons/one_image")
 one_pressed_image = load_image("buttons/one_pressed_image")
@@ -102,14 +113,22 @@ cursor_img = load_image("sprites/orange_cursor")
 your_name_label = load_image("labels/your_name_label", scale=(4, 4))
 your_score_label = load_image("labels/your_score_label", scale=(5, 5))
 save_label = load_image("labels/save_label", scale=(5, 5))
+music_label = load_image("labels/music_label")
+effets_label = load_image("labels/effects_label")
 
 one_level_label = load_image("labels/one_level_label", scale=(2, 2))
 two_level_label = load_image("labels/two_level_label", scale=(2, 2))
 three_level_label = load_image("labels/three_level_label", scale=(2, 2))
 # load_images_end___________________________________________________________#
 
-font = pygame.font.SysFont("consolas", 35)
-font1 = pygame.font.SysFont("consolas", 70)
+
+# font = pygame.font.SysFont("consolas", 35)
+# font1 = pygame.font.SysFont("consolas", 70)
+# font2 = pygame.font.SysFont("consolas", 26)
+
+font = pygame.font.Font(None, 48)
+font1 = pygame.font.Font(None, 70)
+font2 = pygame.font.Font(None, 38)
 
 letters = "abcdefghijklmnopqrstuvwxyz"
 letters += letters.upper() + " 123456789"
@@ -359,15 +378,15 @@ records_button = Button(
 sound_button = Button(
     sound_image,
     sound_pressed_image,
-    (WIDTH // 2 - sound_image.get_width() // 2, 300),
+    (WIDTH // 2 - sound_image.get_width() // 2, 200),
     display,
     collide_button_sound,
 )
 
 theme_button = Button(
-    level_image,
-    level_pressed_image,
-    (WIDTH // 2 - sound_image.get_width() // 2, 400),
+    theme_image,
+    theme_pressed_image,
+    (WIDTH // 2 - theme_image.get_width() // 2, 280),
     display,
     collide_button_sound,
 )
@@ -380,10 +399,10 @@ settings_button = Button(
     collide_button_sound,
 )
 
-help_button = Button(
-    level_image,
-    level_pressed_image,
-    (WIDTH // 2 - level_image.get_width() // 2, 550),
+info_button = Button(
+    info_image,
+    info_pressed_image,
+    (WIDTH // 2 - info_image.get_width() // 2, 550),
     display,
     collide_button_sound,
 )
@@ -801,7 +820,8 @@ def sound_menu():
 
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
-                    slider.release()
+                    music_slider.release()
+                    effects_slider.release()
 
         if back_1_button.collided(mx, my):
             if click:
@@ -810,9 +830,17 @@ def sound_menu():
         cubes.update()
 
         back_1_button.update()
-        slider.update(click, (mx, my))
+        music_slider.update(click, (mx, my))
+        effects_slider.update(click, (mx, my))
 
-        pygame.mixer.music.set_volume(slider.get_value())
+        pygame.mixer.music.set_volume(music_slider.get_value())
+
+        # change volume of all effects sounds in the game
+        for sound in effects_sounds:
+            sound.set_volume(effects_slider.get_value())
+
+        display.blit(music_label, (WIDTH // 2 - music_label.get_width() // 2, 130))
+        display.blit(effets_label, (WIDTH // 2 - effets_label.get_width() // 2, 280))
 
         draw_cursor(mx, my)
 
@@ -856,10 +884,10 @@ def theme_menu():
         if theme_2_button.collided(mx, my):
             if click:
                 texture_index = 1
-        
+
         if texture_index == 0:
             theme_1_button.mouse_on = True
-        
+
         elif texture_index == 1:
             theme_2_button.mouse_on = True
 
@@ -926,7 +954,55 @@ def settings_menu():
 
 
 def info_menu():
-    pass
+    click = False
+    running = True
+
+    info_text = [
+        "       Rapid Roll 2.0",
+        " ",
+        "Movement:",
+        "   W                UP",
+        " A S D   or   LEFT DOWN RIGHT",
+        " ",
+        "LEFT - moving left",
+        "RIGHT - moving right",
+        "UP - decrease falling speed",
+        "DOWN - increase falling speed",
+    ]
+
+    while running:
+        mx, my = pygame.mouse.get_pos()
+        display.fill((40, 40, 40))
+
+        click = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+
+        if back_1_button.collided(mx, my):
+            if click:
+                return
+
+        for i, line in enumerate(info_text):
+            text = font2.render(line, True, (0, 162, 232))
+            display.blit(text, (70, i * (text.get_height() + 10) + 60))
+
+        back_1_button.update()
+
+        draw_cursor(mx, my)
+
+        screen.blit(display, (0, 0))
+        pygame.display.update()
+        clock.tick(FPS)
 
 
 def game(
@@ -968,7 +1044,7 @@ def game(
     if score != 0 and ball_coords_and_health[1] > 0:
         tiles_for_ball.clear()
         for tile in tiles_for_ball_from_file:
-            tiles_for_ball.append(Tile(tile, textures[texture_index][2]))
+            tiles_for_ball.append(Tile(tile, textures[texture_index][1]))
 
         for tile in thorn_tiles_for_ball_from_file:
             thorn_tiles_for_ball.append(Tile(tile, textures[texture_index][2]))
@@ -1142,10 +1218,10 @@ def main_menu():
                 settings_menu()
                 continue
 
-        # if help_button.collided(mx, my):
-        #     if click:
-        #         info_menu()
-        #         continue
+        if info_button.collided(mx, my):
+            if click:
+                info_menu()
+                continue
 
         cubes.update()
 
@@ -1154,7 +1230,7 @@ def main_menu():
         level_button.update()
         records_button.update()
         settings_button.update()
-        # help_button.update()
+        info_button.update()
 
         draw_cursor(mx, my)
 
