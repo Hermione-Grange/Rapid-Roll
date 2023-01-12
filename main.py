@@ -13,12 +13,20 @@ display = pygame.Surface(WINDOW_SIZE)
 FPS = 100
 pygame.mouse.set_visible(False)
 
-pygame.mixer.music.load("844.mp3")
-pygame.mixer.music.set_volume(0.0)
+back_ground_music = [
+    "music/track_1.mp3",
+    "music/track_2.mp3"
+]
+
+pygame.mixer.music.load(back_ground_music[0])
+pygame.mixer.music.set_volume(0.3)
 
 # load sound and music
 collide_button_sound = pygame.mixer.Sound("sounds/button.mp3")
 collide_button_sound.set_volume(0.1)
+
+collide_platform_sound = pygame.mixer.Sound("sounds/ball.mp3")
+collide_platform_sound.set_volume(0.1)
 
 music_slider = Slider(display, (WIDTH // 2, 200), (400, 16))
 music_slider.set_value(pygame.mixer.music.get_volume())
@@ -26,7 +34,7 @@ music_slider.set_value(pygame.mixer.music.get_volume())
 effects_slider = Slider(display, (WIDTH // 2, 350), (400, 16))
 effects_slider.set_value(collide_button_sound.get_volume() * 2)
 
-effects_sounds = [collide_button_sound]
+effects_sounds = [collide_button_sound, collide_platform_sound]
 
 # load_images_start_________________________________________________________#
 ball_image = load_image("sprites/textures_1/red_ball")
@@ -155,6 +163,9 @@ class Ball(pygame.sprite.Sprite):
         self.side_rects = [pygame.Rect(-2, 1, 1, 800), pygame.Rect(600, 1, 1, 800)]
         self.death_rects = [pygame.Rect(0, 800, 600, 2), pygame.Rect(0, 50, 600, 40)]
 
+        self.prev_collide_bottom = None
+        self.prev_gavity = 0
+
     def get_coords(self):
         return self.rect.x, self.rect.y, self.health
 
@@ -185,6 +196,11 @@ class Ball(pygame.sprite.Sprite):
             self.air_timer = 0
         else:
             self.air_timer += 1
+        
+        if collisions["bottom"] and not self.prev_collide_bottom:
+            collide_platform_sound.play()
+        self.prev_collide_bottom = collisions["bottom"]
+        self.prev_gavity = self.gravity
 
         # check to death
         if self.rect.collidelist(self.death_rects + thorn_tiles_for_ball) > -1:
@@ -834,8 +850,8 @@ def sound_menu():
         pygame.mixer.music.set_volume(music_slider.get_value())
 
         # change volume of all effects sounds in the game
-        for sound in effects_sounds:
-            sound.set_volume(effects_slider.get_value() / 2)
+        effects_sounds[0].set_volume(effects_slider.get_value() / 2)
+        effects_sounds[1].set_volume(effects_slider.get_value() / 3)
 
         display.blit(music_label, (WIDTH // 2 - music_label.get_width() // 2, 130))
         display.blit(effets_label, (WIDTH // 2 - effets_label.get_width() // 2, 280))
