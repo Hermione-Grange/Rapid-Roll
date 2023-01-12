@@ -18,13 +18,13 @@ pygame.mixer.music.set_volume(0.0)
 
 # load sound and music
 collide_button_sound = pygame.mixer.Sound("sounds/button.mp3")
-collide_button_sound.set_volume(0.3)
+collide_button_sound.set_volume(0.1)
 
 music_slider = Slider(display, (WIDTH // 2, 200), (400, 16))
 music_slider.set_value(pygame.mixer.music.get_volume())
 
 effects_slider = Slider(display, (WIDTH // 2, 350), (400, 16))
-effects_slider.set_value(collide_button_sound.get_volume())
+effects_slider.set_value(collide_button_sound.get_volume() * 2)
 
 effects_sounds = [collide_button_sound]
 
@@ -445,7 +445,6 @@ theme_2_button = Button(
     collide_button_sound,
 )
 
-
 def save_game(score, tiles_for_ball, thorn_tiles_for_ball, life_hearts, ball):
     with open("SAV/last_game.txt", "w", encoding="utf-8") as file:
         if ball[2] > 0:
@@ -708,7 +707,6 @@ def registration_menu():
         if yes_button_1.collided(mx, my):
             if click:
                 running = False
-                return
 
         if back_space_pressed:
             back_space_counter += 1
@@ -837,7 +835,7 @@ def sound_menu():
 
         # change volume of all effects sounds in the game
         for sound in effects_sounds:
-            sound.set_volume(effects_slider.get_value())
+            sound.set_volume(effects_slider.get_value() / 2)
 
         display.blit(music_label, (WIDTH // 2 - music_label.get_width() // 2, 130))
         display.blit(effets_label, (WIDTH // 2 - effets_label.get_width() // 2, 280))
