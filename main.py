@@ -19,7 +19,7 @@ back_ground_music = [
 ]
 
 pygame.mixer.music.load(back_ground_music[0])
-pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.set_volume(0.0)
 
 # load sound and music
 collide_button_sound = pygame.mixer.Sound("sounds/button.mp3")
@@ -123,6 +123,7 @@ your_score_label = load_image("labels/your_score_label", scale=(5, 5))
 save_label = load_image("labels/save_label", scale=(5, 5))
 music_label = load_image("labels/music_label")
 effets_label = load_image("labels/effects_label")
+game_over_label = load_image("labels/game_over_label", scale=(2, 2))
 
 one_level_label = load_image("labels/one_level_label", scale=(2, 2))
 two_level_label = load_image("labels/two_level_label", scale=(2, 2))
@@ -367,7 +368,7 @@ back_1_button = Button(
 no_button = Button(
     no_image,
     no_pressed_image,
-    (WIDTH // 2 - no_image.get_width() // 2 + 70, 500),
+    (WIDTH // 2 - no_image.get_width() // 2 + 70, 600),
     display,
     collide_button_sound,
 )
@@ -375,7 +376,7 @@ no_button = Button(
 yes_button = Button(
     yes_image,
     yes_pressed_image,
-    (WIDTH // 2 - yes_image.get_width() // 2 - 70, 500),
+    (WIDTH // 2 - yes_image.get_width() // 2 - 70, 600),
     display,
     collide_button_sound,
 )
@@ -659,13 +660,15 @@ def death_menu(score):
                 running = False
 
         cubes.update()
-
         display.blit(
-            your_score_label, (WIDTH // 2 - your_score_label.get_width() // 2, 100)
+            game_over_label, (WIDTH // 2 - game_over_label.get_width() // 2, 80)
+        )
+        display.blit(
+            your_score_label, (WIDTH // 2 - your_score_label.get_width() // 2, 280)
         )
         text = font1.render(str(score), 1, (0, 162, 232))
-        display.blit(text, (WIDTH // 2 - text.get_width() // 2, 200))
-        display.blit(save_label, (WIDTH // 2 - save_label.get_width() // 2, 400))
+        display.blit(text, (WIDTH // 2 - text.get_width() // 2, 380))
+        display.blit(save_label, (WIDTH // 2 - save_label.get_width() // 2, 500))
 
         no_button.update()
         yes_button.update()
